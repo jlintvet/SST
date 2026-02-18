@@ -1,16 +1,21 @@
 name: Update SST Data
 
 on:
-  workflow_dispatch: # This lets you trigger it manually for testing
+  workflow_dispatch:
   schedule:
     - cron: '0 */4 * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # This ensures we have write permissions to push the JSON back
+    permissions:
+      contents: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          path: '.' # Explicitly clone to the root of the workspace
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,18 +28,14 @@ jobs:
 
       - name: Run Script
         run: |
-          echo "Checking current directory..."
-          pwd
-          echo "Listing files to verify location..."
-          ls -F
+          echo "Current Path: $(pwd)"
+          ls -R
           python update_sst.py
-        # This forces the shell to run inside the repo root
-        working-directory: ${{ github.workspace }}
 
       - name: Commit and Push
         run: |
-          git config --global user.name "SST-Bot"
-          git config --global user.email "bot@github.com"
-          git add sst_data.json || echo "No changes"
-          git commit -m "Update SST" || exit 0
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add sst_data.json || echo "No changes to sst_data.json"
+          git commit -m "Auto-update SST data" || exit 0
           git push
