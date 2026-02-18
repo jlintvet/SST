@@ -22,7 +22,13 @@ jobs:
           pip install numpy requests netCDF4
 
       - name: Run Script
-        run: python update_sst.py
+        run: |
+          echo "Checking current directory..."
+          pwd
+          echo "Listing files to verify location..."
+          ls -F
+          python update_sst.py
+        # This forces the shell to run inside the repo root
         working-directory: ${{ github.workspace }}
 
       - name: Commit and Push
