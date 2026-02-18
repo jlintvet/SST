@@ -23,9 +23,7 @@ jobs:
           pip install numpy requests netCDF4
 
       - name: Run Script
-        run: |
-          cd ${{ github.workspace }}
-          python update_sst.py
+        run: python ${{ github.workspace }}/update_sst.py
 
       - name: Commit and Push
         run: |
