@@ -1,10 +1,9 @@
 name: Update SST Data
 
 on:
+  workflow_dispatch: # This lets you trigger it manually for testing
   schedule:
-    # Runs every 4 hours (NOAA satellite passes are frequent)
     - cron: '0 */4 * * *'
-  workflow_dispatch: # Allows you to run it manually for testing
 
 jobs:
   build:
@@ -23,12 +22,13 @@ jobs:
           pip install numpy requests netCDF4
 
       - name: Run Script
-        run: python ${{ github.workspace }}/update_sst.py
+        run: python update_sst.py
+        working-directory: ${{ github.workspace }}
 
       - name: Commit and Push
         run: |
           git config --global user.name "SST-Bot"
           git config --global user.email "bot@github.com"
-          git add sst_data.json
-          git commit -m "Auto-update SST data: $(date)" || exit 0
+          git add sst_data.json || echo "No changes"
+          git commit -m "Update SST" || exit 0
           git push
